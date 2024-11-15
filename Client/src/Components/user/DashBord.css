@@ -1,0 +1,49 @@
+.profile {
+    background-image: url('../../assets/myImage.jpg');
+    background-size: cover; 
+    background-position: center;
+    border-top-right-radius: 35px !important;
+    position: relative;
+}
+
+.overLay {
+    background: rgba(0, 0, 0, 0.4);  /* Apply a subtle dark gradient for the initial view */
+    opacity: 1;  /* Set it to full opacity initially */
+    transition: opacity 1s ease-in-out, background 1s ease-in-out; /* Smooth opacity transition */
+    border-top-right-radius: 35px !important;
+    position: absolute;  /* Position it over the profile div */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.profile:hover .overLay {
+    opacity: 1;  /* No change to opacity, as it's already at 1 */
+    background: rgba(0, 0, 0, 0.5);  /* Darker background on hover */
+}
+
+.about {
+    position: absolute;
+    top: 50%;  /* Center the text vertically */
+    left: 50%;  /* Center the text horizontally */
+    transform: translate(-50%, -50%);  /* Ensure perfect centering */
+    text-align: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;  /* Smooth transition for text */
+}
+
+.profile:hover .about {
+    opacity: 1;  /* Fade in the text when hovering */
+}
+
+.about h4 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.about span {
+    font-size: 16px;
+    display: block;
+}

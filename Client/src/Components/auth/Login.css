@@ -1,0 +1,15 @@
+.custom-swal {
+    width: 300px; /* Set the desired width */
+    height: auto; /* Adjust height dynamically or set a fixed height */
+    padding: 20px; /* Adjust padding if needed */
+    font-size: 14px; /* Customize font size */
+}
+
+.custom-swal .swal2-title {
+    font-size: 18px; /* Adjust title size */
+    font-weight: bold;
+}
+
+.custom-swal .swal2-content {
+    font-size: 14px; /* Adjust text size */
+}
