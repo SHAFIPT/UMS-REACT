@@ -13,3 +13,24 @@
 .custom-swal .swal2-content {
     font-size: 14px; /* Adjust text size */
 }
+.input-gradient {
+    padding: 10px;
+    width: 100%;
+    font-family: "serif";
+    font-weight: 600;
+    word-spacing: 4px;
+    background: black;
+    color: white;
+    outline: none;
+    border: 3px solid transparent; /* Reserve space for the gradient border */
+    border-radius: 12px;
+    background-image: linear-gradient(to right, #23c493, #e9cd70); /* Gradient */
+    background-origin: border-box;
+    background-clip: padding-box, border-box; /* Two layers: one for background, one for border */
+    box-shadow: 0 0 0 3px black inset; /* Adjust the inner background */
+    transition: border 0.3s, box-shadow 0.3s; /* Smooth transition for hover */
+}
+
+.input-gradient:focus {
+    box-shadow: 0 0 0 3px #23c493 inset; /* Glow effect for focus */
+}
