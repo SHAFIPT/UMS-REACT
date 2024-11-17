@@ -6,6 +6,7 @@ interface IUser extends Document {
     email : string;
     password : string;
     isAdmin : boolean;
+    image: string;
 }
 
 export interface IUserDocument extends IUser , Document {
@@ -16,7 +17,8 @@ const userSchema:Schema<IUserDocument> = new mongoose.Schema({
     name  : {type : String , required : true}, 
     email  : {type : String , required : true , unique : true}, 
     password  : {type : String , required : true},
-    isAdmin : {type : Boolean ,default : false} 
+    isAdmin : {type : Boolean ,default : false},
+    image : {type : String}
 })
 
 const User = mongoose.model<IUserDocument>("User", userSchema);

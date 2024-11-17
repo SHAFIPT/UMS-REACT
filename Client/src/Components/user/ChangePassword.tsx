@@ -1,4 +1,4 @@
-import { useState ,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -18,8 +18,10 @@ interface RootState {
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState(""); // To confirm new password
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // For confirm password visibility
 
   const navigate = useNavigate()
 
@@ -35,13 +37,43 @@ const ChangePassword = () => {
     setShowNewPassword(!showNewPassword);
   };
 
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   const handlePasswordChange = async (e) => {
     e.preventDefault();
-    if (!currentPassword || !newPassword) {
+
+    // Validation for current and new passwords
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
       Swal.fire({
         icon: 'warning',
         title: 'Incomplete Field',
-        text: 'Please fill both the current and new password fields!',
+        text: 'Please fill all the fields!',
+        customClass: {
+            popup: 'custom-swal',
+        }
+      });
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Password Mismatch',
+        text: 'New password and confirm password do not match!',
+        customClass: {
+            popup: 'custom-swal',
+        }
+      });
+      return;
+    }
+
+    if (newPassword.length < 8) { // Optional: Enforcing a minimum length for the new password
+      Swal.fire({
+        icon: 'warning',
+        title: 'Weak Password',
+        text: 'New password must be at least 8 characters long.',
         customClass: {
             popup: 'custom-swal',
         }
@@ -183,6 +215,36 @@ const ChangePassword = () => {
                     className="absolute right-3 top-3 text-gray-500 focus:outline-none"
                 >
                     {showNewPassword ? (
+                    <i className="fas fa-eye"></i>
+                    ) : (
+                    <i className="fas fa-eye-slash"></i>
+                    )}
+                </button>
+                </div>
+
+                {/* Confirm New Password Input */}
+                <div className="relative w-full sm:w-[320px]">
+                <input
+                    className="p-3 mb-6 w-full bg-black text-[14px] sm:text-[17px] outline-none"
+                    style={{
+                    fontFamily: "serif",
+                    fontWeight: "600",
+                    wordSpacing: "4px",
+                    border: "3px solid transparent",
+                    borderImage: "linear-gradient(to right, #23c493, #e9cd70) 1",
+                    borderRadius: "12px",
+                    }}
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm New Password"
+                />
+                <button
+                    onClick={toggleConfirmPasswordVisibility}
+                    type="button"
+                    className="absolute right-3 top-3 text-gray-500 focus:outline-none"
+                >
+                    {showConfirmPassword ? (
                     <i className="fas fa-eye"></i>
                     ) : (
                     <i className="fas fa-eye-slash"></i>

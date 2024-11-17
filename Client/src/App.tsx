@@ -6,6 +6,7 @@ import Login from "./Components/auth/Login";
 import ChangePassword from "./Components/user/ChangePassword";
 import  { Suspense, lazy } from "react";
 import LoadingSpinner from "./Components/LoadiingSpinner/LoadingSpinner";
+import EditProfileImage from "./Components/user/EditProfileImage";
 
 // Lazy load Dashboard component
 const Dashboard = lazy(() => import('./Components/user/DashBoard'));
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/change-password" element={<ChangePassword />} />
           {/* Lazy-loaded Dashboard route */}
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/editImage" element={<EditProfileImage/>} />
         </Routes>
       </Suspense>
     </div>
