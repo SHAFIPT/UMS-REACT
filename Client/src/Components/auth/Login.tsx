@@ -66,8 +66,12 @@ const Login = () => {
                 : 'http://localhost:5000/api/auth/register';
     
             const response = await axios.post(url, payload);
+
+            console.log('This is the responce data ',response.data)
     
-            if (response.data.status === 'success') {
+            if (response.status === 200) {
+
+              
                 // Set cookies
                 Cookies.set('token', response.data.token, { 
                     expires: 7, 
@@ -75,7 +79,7 @@ const Login = () => {
                     sameSite: 'Strict' 
                 });
                 Cookies.set('email', email, { 
-                    expires: 1, 
+                    expires: 7, 
                     secure: true, 
                     sameSite: 'Strict' 
                 });

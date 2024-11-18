@@ -5,8 +5,8 @@ import generateToken from '../utils/generateToken';
 import path from 'path'
 
 export const registerUser = async (req : Request , res : Response) : Promise<void> => {
-    const {name ,email ,password} = req.body;
 
+    const {name ,email ,password} = req.body;
     console.log("this is register name':", name);
     console.log("this is register name:", email);
     console.log("this is register name", password);
@@ -38,7 +38,7 @@ export const registerUser = async (req : Request , res : Response) : Promise<voi
 
         const token = generateToken(newUser._id.toString());
 
-        res.status(201).json({token , user : {id : newUser._id.toString() , name ,email , isAdmin : newUser.isAdmin}})
+        res.status(200).json({token , user : {id : newUser._id.toString() , name ,email , isAdmin : newUser.isAdmin}})
 
     } catch (error) {
         res.status(500).json({message : 'Error registering user',error})
@@ -92,6 +92,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     export const getUserDetails = async (req : Request , res : Response) : Promise<void> => {
 
         const {email} = req.body;
+        
         
         try {
 

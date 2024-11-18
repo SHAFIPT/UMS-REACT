@@ -2,7 +2,7 @@ import { Method } from './../../Client/node_modules/axios/index.d';
 import cors from 'cors';
 import express from 'express';
 import authRouter from './routers/authRouter';
-import userRouter from './routers/userRouter';
+import adminRouter from './routers/adminRouter';
 import connectDB from './config/db'
 import * as dotenv from 'dotenv';
 import path  = require('path');
@@ -25,6 +25,6 @@ app.use(express.urlencoded({  limit: '10mb',extended: false }));
 connectDB() 
  
 app.use('/api/auth',authRouter); 
-app.use('/api/Adimn',userRouter);
+app.use('/api/admin',adminRouter);
 
 app.listen(process.env.PORT, ()=> console.log(`Server running on Port ${process.env.PORT}`))      
