@@ -7,15 +7,12 @@ import path from 'path'
 export const registerUser = async (req : Request , res : Response) : Promise<void> => {
 
     const {name ,email ,password} = req.body;
-    console.log("this is register name':", name);
-    console.log("this is register name:", email);
-    console.log("this is register name", password);
+
 
     try {
         
         const existingUser = await User.findOne({email})
-
-        console.log("Existing user check:", existingUser);
+        
 
         if(existingUser){
              res.status(400).json({message : 'User already exist'});
@@ -34,7 +31,6 @@ export const registerUser = async (req : Request , res : Response) : Promise<voi
 
         await newUser.save()
 
-        console.log("New user saved:", newUser);
 
         const token = generateToken(newUser._id.toString());
 
@@ -117,8 +113,9 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         const {email , currentPassword , newPassword} = req.body;
 
         try {
-
+  
             const user = await User.findOne({email});
+
 
             if(!user){
                 res.status(404).json({message : 'User not found'})
@@ -167,9 +164,6 @@ export const uploadProfileImage = async (req: Request, res: Response): Promise<v
     try {
 
         const {id , image} = req.body;
-
-        console.log("id",id)
-        console.log("name",image)
 
         const updateUser = await User.findOneAndUpdate(
             {_id : id},

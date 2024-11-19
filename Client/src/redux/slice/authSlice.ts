@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
 
 const initialState = {
     email : null,
@@ -13,6 +14,7 @@ const usereSlice = createSlice({
         },
         clearUser(state){
             state.email = null
+            Cookies.remove('token')
         }
     }
 })

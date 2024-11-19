@@ -1,73 +1,107 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
-import Cookies from 'js-cookie';
-import '../auth/Login.css'
+import React, { useState } from "react";
+import Swal from "sweetalert2";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 interface User {
-    _id : string
     name: string;
     image: string;
     email: string;
     isAdmin: boolean;
+    password : string
 }
 
 type EditUserPageProps = {
-    user: User;
     onClose: () => void;
     onUpdateUser: (updatedUser: User) => void; // Added onUpdateUser to props type
   };
-  
 
-  const EditUserPage = ({ user, onClose, onUpdateUser }: EditUserPageProps) =>{
-    const [name , setName] = useState('')
-    const [email , setEmail] = useState('')
+const AddUsarPage = ({onClose , onUpdateUser} : EditUserPageProps) => {
+
+    const [name ,setName] = useState('')
+    const [email ,setEmail] = useState('')
     const [image , setImage] = useState('')
+    const [password , setPassword] = useState('')
     const [isAdmin , setIsAdmin] = useState(false)
+    const [showPassword, setShowPassword] = useState(false);
+    const [errors , setErrors] = useState({
+        name : '',
+        email : '',
+        password : '',
+        image : '',
+    })
 
-    useEffect(()=>{
-        if(user){
-            setName(user.name)
-            setEmail(user.email)
-            setImage(user.image || '')
-            setIsAdmin(user.isAdmin)
-        }else{
-            setName('')
-            setEmail('')
-            setImage('')
-            setIsAdmin(false)
-        }
-    },[user])
+    const toggleEyeIcon = () => setShowPassword(!showPassword)
 
-  
-    const handleFileChange = (e : React.ChangeEvent<HTMLInputElement>) : void => {
-        const file = e.target.files ? e.target.files[0] : null;
+    const validateName = (value: string) => {
+        if (!value.trim()) return "Name is required.";
+        if (value.length < 3) return "Name must be at least 3 characters.";
+        return "";
+      };
+    
+      const validateEmail = (value: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!value.trim()) return "Email is required.";
+        if (!emailRegex.test(value)) return "Please enter a valid email.";
+        return "";
+      };
+    
+      const validatePassword = (value: string) => {
+        const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{8,}$/;
+        if (!value.trim()) return "Password is required.";
+        if (!passwordRegex.test(value))
+          return "Password must be at least 8 characters, include a number and a special character.";
+        return "";
+      };
+    
+      const validateImage = (value: string) => {
+        if (!value.trim()) return "Profile image is required.";
+        return "";
+      };
+
+
+
+    const handleFileChange  = (e : React.ChangeEvent<HTMLInputElement>) : void => {
+        const file = e.target.files  ? e.target.files[0] : null ;
         if(file && file.type.startsWith('image')){
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
-                setImage(reader.result as string)
+                setImage(reader.result as string);
+                setErrors((prev => ({...prev ,image :''})));
             }
-            reader.onerror = (err) => console.error("Error reading file",err)
+            reader.onerror = (err) => console.error("Error reader file",err)
+        }else{
+            setErrors((prev) => ({...prev, image :'Invalid file type. Please upload an image.'}))
         }
-    }
+    };
 
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-    
-        const token = Cookies.get("token");
+    const handleSubmit = async (e : React.FormEvent) => {
+        e.preventDefault()
+        const token = Cookies.get("token")
+
+        const validationErrors = {
+            name : validateName(name),
+            email : validateEmail(email),
+            password : validatePassword(password),
+            image : validateImage(image)
+        }
+
+        setErrors(validationErrors);
+
+        if(Object.values(validationErrors).some((err)=> err))return;
+
         try {
-            const Userdata: User = { _id: user._id, name, email, image, isAdmin };
-            const response = await axios.put(
-                `http://localhost:5000/api/admin/update-Profile/${user._id}`,
-                Userdata,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
 
-            // Display success or error message based on the response
+            const UserData  : User = {name , email ,password ,isAdmin ,image} 
+            const response  =  await axios.post(
+                'http://localhost:5000/api/admin/add-User',
+                UserData, { headers: { Authorization: `Bearer ${token}` } }
+            )
+
             if (response.status === 200) {
-                onUpdateUser(Userdata); 
+                onUpdateUser(UserData); 
                 onClose(); // Close the modal on successful response
                 Swal.fire({
                     icon: 'success',
@@ -83,16 +117,18 @@ type EditUserPageProps = {
                     customClass: { popup: 'custom-swal' }
                 });
             }
-        } catch (error: any) {
-            console.error('Error during form submission:', error);
+            
+        } catch (error : any) {
+            console.error("Error during Add user Submission :",error)
             Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.response?.data?.message || 'An unexpected error occurred!',
+                icon : 'error',
+                title : 'Error',
+                text : error.response?.data?.message || 'An unexpedted error occurred!',
                 customClass: { popup: 'custom-swal' }
-            });
+            })
         }
-    };
+
+    }
 
 
     return (
@@ -140,6 +176,7 @@ type EditUserPageProps = {
                             accept="image/*"
                             onChange={handleFileChange}
                             />
+                            {errors.image && <p className="text-red-500 text-sm">{errors.image}</p>}
                         </div>
                     </div>
                     <div className="space-y-4">
@@ -147,7 +184,10 @@ type EditUserPageProps = {
                             type="text" 
                             placeholder="Enter your name" 
                             value={name}
-                            onChange={(e)=> setName(e.target.value)}
+                            onChange={(e) => {
+                                setName(e.target.value);
+                                setErrors((prev) => ({ ...prev, name: validateName(e.target.value) }));
+                              }}
                             className="w-full px-4 py-4 border bg-black text-white rounded-md focus:outline-none"
                             style={{
                                 fontFamily: 'serif',
@@ -158,11 +198,15 @@ type EditUserPageProps = {
                                 borderRadius: '12px',
                             }}
                         />
+                         {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                         <input 
                             type="email" 
                             placeholder="Enter your Email" 
                             value={email}
-                            onChange={(e)=> setEmail(e.target.value)}
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                                setErrors((prev) => ({ ...prev, email: validateEmail(e.target.value) }));
+                              }}
                             className="w-full px-4 py-4 border bg-black text-white rounded-md focus:outline-none"
                             style={{
                                 fontFamily: 'serif',
@@ -173,6 +217,44 @@ type EditUserPageProps = {
                                 borderRadius: '12px',
                             }}
                         />
+                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                        <div className="relative">
+    <input
+        type={showPassword ? "text" : "password"} // Toggle visibility
+        placeholder="Enter your password"
+        value={password}
+        onChange={(e) => {
+            setPassword(e.target.value);
+            setErrors((prev) => ({
+                ...prev,
+                password: validatePassword(e.target.value),
+            }));
+        }}
+        className="w-full px-4 py-4 border bg-black text-white rounded-md focus:outline-none"
+        style={{
+            fontFamily: "serif",
+            fontWeight: "600",
+            wordSpacing: "4px",
+            border: "3px solid transparent",
+            borderImage: "linear-gradient(to right, #23c493, #e9cd70) 1",
+            borderRadius: "12px",
+        }}
+    />
+    <button
+        onClick={toggleEyeIcon}
+        type="button"
+        className="absolute top-7 right-3 -translate-y-1/2 text-gray-500 focus:outline-none"
+    >
+        {showPassword ? (
+            <i className="fas fa-eye"></i>
+        ) : (
+            <i className="fas fa-eye-slash"></i>
+        )}
+    </button>
+    {errors.password && (
+        <p className="text-red-500 text-sm">{errors.password}</p>
+    )}
+</div>
                         
                         <button 
                             type="submit" 
@@ -191,4 +273,4 @@ type EditUserPageProps = {
     );
 };
 
-export default EditUserPage;
+export default AddUsarPage

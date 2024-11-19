@@ -132,7 +132,7 @@ const EditProfile = () => {
       <form onSubmit={handleSubmit}>
         <div className="flex justify-center items-center p-4 mt-12 sm:mt-12 md:mt-0 sm:p-8 md:p-[57px]">
           <div className="log_Page flex flex-col w-full sm:w-[420px] md:w-[450px] bg-[#222222] h-auto sm:h-[450px] lg:h-auto p-6 sm:p-8 items-center rounded-[6px]">
-            <h1 className="text-[30px] sm:text-[40px] md:text-[39px] font-extrabold mb-6 sm:mb-7">Edit Profile</h1>
+            <h1 className="text-[30px] sm:text-[40px] md:text-[39px] font-extrabold mb-6 sm:mb-7 bg-gradient-to-r from-[#23c493] to-[#e9cd70] text-transparent bg-clip-text">Edit Profile</h1>
 
             <div className="w-full sm:w-[320px] mb-6">
               <input

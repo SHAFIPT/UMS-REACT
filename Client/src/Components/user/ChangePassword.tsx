@@ -2,18 +2,10 @@ import { useState, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import '../user/DashBord.css'
 
-interface UserState {
-    email: string;
-}
-
-interface RootState {
-    user: UserState;
-}
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -25,7 +17,7 @@ const ChangePassword = () => {
 
   const navigate = useNavigate()
 
-  const email = useSelector((state: RootState) => state.user.email);
+  const email = Cookies.get('email')
 
   console.log("This is redux email data", email);
 

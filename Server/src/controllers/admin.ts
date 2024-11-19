@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { updateUser } from './authControllers';
 import User from "../models/User";
 import { Request, Response } from "express";
@@ -35,10 +36,7 @@ export const getUserDetails = async (req :Request , res : Response) : Promise<vo
        // Get the total count of users for calculating total pages
        const totalUsers = await User.countDocuments(queryFilter);
        const totalPages = Math.ceil(totalUsers / limitNumber);
-   
-       // Send the response with the users and pagination data
 
-           console.log(users)
 
        res.status(200).json({
          users,
@@ -55,12 +53,6 @@ export const getUserDetails = async (req :Request , res : Response) : Promise<vo
 
     const {id} = req.params;
     const {name , email , image , isAdmin} = req.body;
-
-    console.log("this is id ",id)
-    console.log("this is name ",name)
-    console.log("this is image ",image)
-    console.log("this is email ",email)
-    console.log("this is isAdmin ",isAdmin)
 
     try {
 
@@ -91,3 +83,53 @@ export const getUserDetails = async (req :Request , res : Response) : Promise<vo
         res.status(500).json({message : 'Error occured during update the profile image'})
     }
    }
+
+  export const addNewUser = async (req : Request , res : Response) : Promise<void> => {
+
+    const {name , email , image , password , isAdmin} = req.body;
+
+    try {
+
+      const Existinguser = await User.findOne({email})
+
+      if(Existinguser){
+        res.status(400).json({message : 'User is already exist!'})
+        return
+      }
+
+      const hashedPassword = await bcrypt.hash(password ,10)
+
+      const newUser = new User({
+        name, 
+        email,
+        image,
+        password : hashedPassword,
+        isAdmin
+      });
+
+      await newUser.save()
+
+      res.status(200).json({message : 'New User added successfully..!'})
+      
+    } catch (error) {
+      res.status(500).json({message : 'Error occured during add new User!'})
+    }
+  }  
+
+  export const deleteUser = async  (req : Request , res : Response) : Promise<void> => {
+
+    try {
+
+      const {id} = req.params
+ 
+      console.log("This is user id",id)
+
+      await User.findByIdAndDelete(id);
+
+      res.status(200).json({ message: 'User deleted successfully.' });
+
+    } catch (error) {
+      res.status(500).json({message : 'Error occured during delete user'})
+    }
+  }
+  

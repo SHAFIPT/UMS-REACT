@@ -1,7 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { clearUser } from "../../redux/slice/authSlice";
+import { useDispatch } from "react-redux";
 
 const Navbar = () => {
+
+  const dispatch = useDispatch()
 
   const navigate = useNavigate()
   const handleToNavigate = () => {
@@ -9,7 +13,7 @@ const Navbar = () => {
   }
 
   const handleLogout = () => {
-    Cookies.remove('token');
+    dispatch(clearUser())
     navigate('/')
   }
 

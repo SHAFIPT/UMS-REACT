@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
+import { useDispatch, UseDispatch } from "react-redux";
+import { clearUser } from "../../redux/slice/authSlice";
 import {  useNavigate } from "react-router-dom";
 import '../auth/Login.css'
 import EditUserPage from "./EditUserPage";
+import AddUsarPage from "./AddUsarPage";
 
 interface User {
     _id: string;
@@ -22,10 +25,12 @@ const AdminNavbar = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen , setIsModalOpen] = useState(false);
-  const [selectedUser , setSelectedUser] = useState(null);
+  const [isModalAddOpen , setIsModalAddOpen] = useState(false);
+  const [selectedUser , setSelectedUser] = useState<User | null>(null);
   const [debouncedSearch , setDebouncedSerch] = useState('');
 
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
@@ -94,20 +99,25 @@ const AdminNavbar = () => {
   };
 
   const handleLogout = () => {
-    const token = Cookies.get('token');
-    if(token){
-        Cookies.remove('token')
-        navigate('/')
-    }
+    dispatch(clearUser())
+    navigate('/')
   }
 
-  const handleEditButton = (user)=>{
+  const handleAddUser = (user : User)=>{
+    setSelectedUser(user)
+    setIsModalAddOpen(true)
+    setIsModalOpen(false)
+  }
+
+  const handleEditButton = (user : User )=>{
     setSelectedUser(user)
     setIsModalOpen(true)
+    setIsModalAddOpen(false)
   }
 
   const closeModal = () => {
     setIsModalOpen(false)
+    setIsModalAddOpen(false)
     setSelectedUser(null)
   }
 
@@ -115,6 +125,53 @@ const AdminNavbar = () => {
     setUsers((prevUsers) =>
       prevUsers.map((user) => (user._id === updatedUser._id ? updatedUser : user))
     );
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+
+    console.log("this is deleted userId",userId)
+    try {
+      const confirmResult = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won’t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        customClass: { popup: 'custom-swal' },
+      });
+  
+      if (confirmResult.isConfirmed) {
+        const token = Cookies.get('token');
+        if (!token) {
+          throw new Error('Authentication token not found.');
+        }
+  
+        await axios.delete(`http://localhost:5000/api/admin/deleteUser/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        await fetchUsers(debouncedSearch, currentPage);
+  
+        Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'The user has been deleted.',
+          customClass: { popup: 'custom-swal' },
+        });
+      }
+    } catch (error: any) {
+
+      const errorMessage = error.response?.data?.message || 'Failed to delete user.';
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMessage,
+        customClass: { popup: 'custom-swal' },
+      });
+      console.error('An error occurred during deletion:', error);
+    }
   };
 
   return (
@@ -192,7 +249,9 @@ const AdminNavbar = () => {
 
           {/* Buttons */}
           <div className="flex items-center space-x-4">
-            <button className="px-4 md:px-6 py-2 md:py-3 border-2 rounded-[14px] bg-gradient-to-r from-[#23c493] to-[#e9cd70] text-transparent bg-clip-text font-bold hover:opacity-80 transition border-gradient whitespace-nowrap">
+            <button className="px-4 md:px-6 py-2 md:py-3 border-2 rounded-[14px] bg-gradient-to-r from-[#23c493] to-[#e9cd70] text-transparent bg-clip-text font-bold hover:opacity-80 transition border-gradient whitespace-nowrap" 
+            onClick={handleAddUser}
+            >
               Add User
             </button>
             <button onClick={handleLogout} className="px-4 md:px-6 py-2 md:py-3 border-2 rounded-[14px] bg-gradient-to-r from-[#23c493] to-[#e9cd70] text-transparent bg-clip-text font-bold hover:opacity-80 transition border-gradient whitespace-nowrap">
@@ -238,7 +297,9 @@ const AdminNavbar = () => {
                         >
                           Edit
                         </button>
-                        <button className="px-2 md:px-4 py-1 md:py-2 text-sm md:text-base bg-red-600 rounded-lg hover:bg-red-700">
+                        <button className="px-2 md:px-4 py-1 md:py-2 text-sm md:text-base bg-red-600 rounded-lg hover:bg-red-700"
+                        onClick={()=>handleDeleteUser(user._id)}
+                        >
                           Delete
                         </button>
                       </div>
@@ -266,6 +327,29 @@ const AdminNavbar = () => {
             </button>
             <EditUserPage 
                 user={selectedUser} 
+                onClose={closeModal}
+                onUpdateUser={handleUpdateUser}
+            />
+        </div>
+    </div>
+)}
+          {isModalAddOpen && selectedUser && (
+    <div
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+        onClick={closeModal}
+    >
+        <div
+            className="bg-[#222222] rounded-lg shadow-xl w-full max-w-md relative"
+            onClick={(e) => e.stopPropagation()}
+        >
+            {/* Add close icon */}
+            <button 
+                onClick={closeModal} 
+                className="absolute top-4 right-4 text-white text-2xl hover:text-[#23c493]"
+            >
+                ×
+            </button>
+            <AddUsarPage
                 onClose={closeModal}
                 onUpdateUser={handleUpdateUser}
             />

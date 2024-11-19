@@ -72,7 +72,7 @@ const DashBoard = () => {
     <div>
       <Navbar />
       <div className="wrapper flex justify-center items-center p-4 sm:p-8 relative">
-        <div className="profile relative flex justify-center items-center bg-white w-[300px] sm:w-[400px] md:w-[400px] h-[300px] sm:h-[350px] md:h-[400px] mt-8 sm:mt-14 cursor-pointer rounded-tr-[35px] border-[2px] border-[#04533b]">
+        <div className="profile relative flex justify-center items-center bg-white w-[300px]  sm:w-[400px] md:w-[400px] h-[300px] sm:h-[350px] md:h-[400px] mt-24 sm:mt-14 cursor-pointer rounded-tr-[35px] border-[2px] border-[#04533b]">
           {/* Image */}
           <img
             src={user?.image || "../../assets/myImage.jpg"}
@@ -103,7 +103,7 @@ const DashBoard = () => {
           </div>
         </div>
       </div>
-      <div className="w-[140px] sm:w-[280px] md:w-[400px] h-[3px] bg-gradient-to-r from-[#23c493] to-[#e9cd70] ml-auto sm:ml-auto -mt-1 sm:-mt-1"></div>
+      <div className="w-[140px] sm:w-[280px] md:w-[400px] h-[3px] bg-gradient-to-r from-[#23c493] to-[#e9cd70] ml-auto sm:ml-auto mt-24 sm:-mt-1"></div>
     </div>
   );
 }
